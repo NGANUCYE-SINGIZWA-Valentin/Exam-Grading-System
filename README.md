@@ -12,7 +12,7 @@ It converts raw exam marks into letter grades and is tested using JUnit 4.
 | **Name** | Nganucye Singizwa Valentin |
 | **ID** | 27201 |
 | **Course** | Software Testing |
-| **Semester** | Two, 2025–2026 |
+| **Semester** | Summer, 2025–2026 |
 
 ---
 
