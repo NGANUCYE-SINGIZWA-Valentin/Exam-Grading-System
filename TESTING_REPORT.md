@@ -11,9 +11,9 @@
 
 # 1. Introduction
 
-This report describes the testing activities carried out for the Exam Grading System project using JUnit 4 and Maven. The objective was to implement the required business rules for converting raw marks into letter grades and verify that they work correctly using unit tests, lifecycle annotations, and JUnit assertions.
+This report is about the testing I did for the Exam Grading System project. I used JUnit 4 and Maven. The goal was to write a service that gives letter grades based on marks, and then write tests to check that it works correctly.
 
-The system accepts integer marks from 0 to 100, converts them to letter grades (A, B, C, D, F), and rejects any mark outside that range with an `IllegalArgumentException`. It also supports batch grading via `gradeAll` and class average calculation via `classAverage`.
+The system takes a mark between 0 and 100 and returns a grade like A, B, C, D, or F. If the mark is less than 0 or more than 100, the system throws an error. It can also grade many marks at once using `gradeAll`, and calculate the class average using `classAverage`.
 
 ---
 
@@ -21,23 +21,23 @@ The system accepts integer marks from 0 to 100, converts them to letter grades (
 
 ## @BeforeClass
 
-Used once before all tests to print a start message to the console. It must be `static` because JUnit 4 calls it before creating any instance of the test class — there is no object to call it on yet.
+I used this to print a message before all tests start. It only runs once. It has to be `static` because JUnit runs it before creating any test object.
 
 ## @Before
 
-Creates a new `GradingService` before each test. This ensures each test starts with a clean, predictable state and no test can be affected by side effects from a previous one.
+I used this to create a new `GradingService` before each test. This way every test starts fresh and does not use results from the previous test.
 
 ## @Test
 
-Runs each grading test. Used on all 15 test methods. The `expected` attribute (e.g. `@Test(expected = IllegalArgumentException.class)`) is used on exception tests to assert that the correct exception is thrown.
+This marks a method as a test. I used it on all 15 tests. When I add `expected = IllegalArgumentException.class` inside it, JUnit checks that the method throws that error.
 
 ## @After
 
-Used to set the `service` reference to `null` after every test, releasing the object and making it clear that no state is carried between tests.
+I used this to set `service` to null after each test. This cleans up after every test.
 
 ## @AfterClass
 
-Used once after all tests have completed to print a finish message to the console. Also `static` for the same reason as `@BeforeClass`.
+I used this to print a message after all tests finish. It also has to be `static` for the same reason as `@BeforeClass`.
 
 ---
 
@@ -50,8 +50,8 @@ Used once after all tests have completed to print a finish message to the consol
 | Grade C | 70 – 79 | `"C"` |
 | Grade B | 80 – 89 | `"B"` |
 | Grade A | 90 – 100 | `"A"` |
-| Invalid (low) | Below 0 | `IllegalArgumentException` |
-| Invalid (high) | Above 100 | `IllegalArgumentException` |
+| Invalid (too low) | Below 0 | Error |
+| Invalid (too high) | Above 100 | Error |
 
 ---
 
@@ -59,7 +59,7 @@ Used once after all tests have completed to print a finish message to the consol
 
 | Input | Expected |
 |---:|---|
-| -1 | `IllegalArgumentException` |
+| -1 | Error |
 | 0 | `"F"` |
 | 59 | `"F"` |
 | 60 | `"D"` |
@@ -70,9 +70,9 @@ Used once after all tests have completed to print a finish message to the consol
 | 89 | `"B"` |
 | 90 | `"A"` |
 | 100 | `"A"` |
-| 101 | `IllegalArgumentException` |
+| 101 | Error |
 
-Each boundary has its own dedicated test method. Boundary bugs (`>=` vs `>`) are the most common bugs in grading systems and only boundary tests catch them.
+I wrote a separate test for each of these values because mistakes usually happen at the edges, for example using `>` instead of `>=`.
 
 ---
 
@@ -80,30 +80,30 @@ Each boundary has its own dedicated test method. Boundary bugs (`>=` vs `>`) are
 
 | Test Method | Purpose | Expected Result |
 |---|---|---|
-| `grade_shouldReturnF_whenMarkIsZero` | Boundary: lowest valid mark | `"F"` |
-| `grade_shouldReturnF_whenMarkIsFiftyNine` | Boundary: top of F partition | `"F"` |
-| `grade_shouldReturnD_whenMarkIsSixty` | Boundary: bottom of D partition | `"D"` |
-| `grade_shouldReturnD_whenMarkIsSixtyNine` | Boundary: top of D partition | `"D"` |
-| `grade_shouldReturnC_whenMarkIsSeventy` | Boundary: bottom of C partition | `"C"` |
-| `grade_shouldReturnC_whenMarkIsSeventyNine` | Boundary: top of C partition | `"C"` |
-| `grade_shouldReturnB_whenMarkIsEighty` | Boundary: bottom of B partition | `"B"` |
-| `grade_shouldReturnB_whenMarkIsEightyNine` | Boundary: top of B partition | `"B"` |
-| `grade_shouldReturnA_whenMarkIsNinety` | Boundary: bottom of A partition | `"A"` |
-| `grade_shouldReturnA_whenMarkIsOneHundred` | Boundary: highest valid mark | `"A"` |
-| `grade_shouldThrowException_whenMarkIsMinusOne` | Invalid: one below minimum | `IllegalArgumentException` |
-| `grade_shouldThrowException_whenMarkIsOneHundredOne` | Invalid: one above maximum | `IllegalArgumentException` |
-| `gradeAll_shouldReturnGradesInTheSameOrder` | Batch grading preserves order | `{"A", "F", "C"}` |
-| `classAverage_shouldReturnCorrectAverage` | Average of four marks | `75.0` |
-| `classAverage_shouldThrowException_whenMarksAreEmpty` | Empty array rejected | `IllegalArgumentException` |
+| `grade_shouldReturnF_whenMarkIsZero` | Check mark 0 gives F | `"F"` |
+| `grade_shouldReturnF_whenMarkIsFiftyNine` | Check mark 59 gives F | `"F"` |
+| `grade_shouldReturnD_whenMarkIsSixty` | Check mark 60 gives D | `"D"` |
+| `grade_shouldReturnD_whenMarkIsSixtyNine` | Check mark 69 gives D | `"D"` |
+| `grade_shouldReturnC_whenMarkIsSeventy` | Check mark 70 gives C | `"C"` |
+| `grade_shouldReturnC_whenMarkIsSeventyNine` | Check mark 79 gives C | `"C"` |
+| `grade_shouldReturnB_whenMarkIsEighty` | Check mark 80 gives B | `"B"` |
+| `grade_shouldReturnB_whenMarkIsEightyNine` | Check mark 89 gives B | `"B"` |
+| `grade_shouldReturnA_whenMarkIsNinety` | Check mark 90 gives A | `"A"` |
+| `grade_shouldReturnA_whenMarkIsOneHundred` | Check mark 100 gives A | `"A"` |
+| `grade_shouldThrowException_whenMarkIsMinusOne` | Check -1 gives error | Error |
+| `grade_shouldThrowException_whenMarkIsOneHundredOne` | Check 101 gives error | Error |
+| `gradeAll_shouldReturnGradesInTheSameOrder` | Check gradeAll returns grades in order | `{"A", "F", "C"}` |
+| `classAverage_shouldReturnCorrectAverage` | Check average of 4 marks | `75.0` |
+| `classAverage_shouldThrowException_whenMarksAreEmpty` | Check empty array gives error | Error |
 
 ---
 
 # 6. Assertions Used
 
-- `assertEquals(String, String)` – Compared the expected letter grade string to the actual result returned by `grade()`.
-- `assertEquals(double, double, delta)` – Compared the expected average to the actual result of `classAverage()`. The delta `0.001` accounts for harmless floating-point rounding differences.
-- `assertArrayEquals(String[], String[])` – Compared the full array of grades returned by `gradeAll()` element by element.
-- `@Test(expected = ...)` – Asserted that `IllegalArgumentException` is thrown for invalid marks and empty arrays.
+- `assertEquals(String, String)` – I used this to check that the grade returned matches what I expected.
+- `assertEquals(double, double, delta)` – I used this for `classAverage` because double numbers can have very small differences. The delta `0.001` means the result just needs to be very close to the expected value.
+- `assertArrayEquals(String[], String[])` – I used this to check that `gradeAll` returns the right grades in the right order.
+- `@Test(expected = ...)` – I used this to check that the system throws an error when the mark is invalid or the array is empty.
 
 ---
 
@@ -111,31 +111,31 @@ Each boundary has its own dedicated test method. Boundary bugs (`>=` vs `>`) are
 
 **Why use `assertArrayEquals()` instead of `assertEquals()` for arrays?**
 
-`assertEquals` on two arrays compares their object references, not their contents. Two separate arrays with identical values are different objects in memory, so `assertEquals` would fail even when the grades are correct. `assertArrayEquals` compares each element at the same index, which is the correct tool for verifying array output like `gradeAll`.
+When you use `assertEquals` on two arrays, Java checks if they are the same object in memory, not if they have the same values. So even if both arrays have `{"A", "F", "C"}`, `assertEquals` will say they are not equal because they are two different arrays. `assertArrayEquals` checks each value one by one, which is what we actually want.
 
 **Which boundary tests failed after changing `>=` to `>`, and why?**
 
-Changing `mark >= 90` to `mark > 90` caused exactly one test to fail: `grade_shouldReturnA_whenMarkIsNinety`. Mark `90` is the lower boundary of the A partition. With `>` instead of `>=`, mark `90` no longer satisfies the A condition and falls through to the B branch, returning `"B"` instead of `"A"`. No other test failed because all other A-partition boundary values (91–100) still satisfy `> 90`, and the B-partition tests use marks 80–89 which are completely unaffected. This is exactly why every boundary needs its own dedicated test — a bug at exactly `90` is invisible to any test that does not use the value `90`.
+Only one test failed: `grade_shouldReturnA_whenMarkIsNinety`. When I changed `mark >= 90` to `mark > 90`, mark 90 no longer went into the A block. Instead it went into the B block and returned `"B"` instead of `"A"`. The other tests for marks 91 to 100 still passed because those marks are still greater than 90. The tests for B (80 to 89) were not affected at all. This shows why we need a test for exactly 90 — without it, this bug would not be caught.
 
 **Why must `@BeforeClass` and `@AfterClass` be static in JUnit 4?**
 
-JUnit 4 creates a new instance of the test class for every `@Test` method. `@BeforeClass` and `@AfterClass` must run once for the entire class, before or after any instance is created. Since no instance exists at that point, the method must be `static` so JUnit can call it on the class itself.
+JUnit creates a new object of the test class for each test method. `@BeforeClass` runs before any object is created, so there is no object to call the method on. That is why it must be `static` — so JUnit can call it directly on the class without needing an object.
 
 **When would you use `@Before` instead of `@BeforeClass`?**
 
-Use `@Before` when each test needs its own independent copy of an object — for example, a fresh `GradingService` so one test cannot affect another. Use `@BeforeClass` for expensive setup that is safe to share across all tests, such as opening a database connection once.
+I use `@Before` when I want each test to have its own fresh object. For example, I create a new `GradingService` before each test so that one test does not affect another. I would use `@BeforeClass` for something that only needs to be set up once, like connecting to a database.
 
 **Does `@After` still run if a test fails?**
 
-Yes. JUnit 4 guarantees that `@After` runs after every test regardless of whether it passed, failed, or threw an exception. This makes it reliable for cleanup such as closing resources or nulling references.
+Yes. Even if a test fails, `@After` still runs. JUnit always runs it after every test no matter what happened. This is useful for cleaning up, like setting `service` to null.
 
 ---
 
-# 8. Mutation Testing Experiment
+# 8. Intentional Bug Experiment
 
-To verify that the boundary tests can actually detect bugs, the condition `mark >= 90` in `GradingService.grade()` was deliberately changed to `mark > 90` and `mvn test` was run.
+To check that my tests can actually catch bugs, I changed `mark >= 90` to `mark > 90` in `GradingService.java` and ran `mvn test`.
 
-**Result with the mutation active:**
+**Result:**
 
 ```
 Tests run: 15, Failures: 1, Errors: 0, Skipped: 0
@@ -144,17 +144,15 @@ FAILED: grade_shouldReturnA_whenMarkIsNinety
 expected:<A> but was:<B>
 ```
 
-![Failing test with mutation](Testing_images/failing_mvn_test_when_marks_was_greater_than_to_90.png)
+![Failing test after introducing bug](Testing_images/failing_mvn_test_when_marks_was_greater_than_to_90.png)
 
-The boundary test for mark `90` caught the bug immediately. After restoring `>=`, all 15 tests passed.
-
-This technique is called **mutation testing**: a fault is deliberately injected into the source code to confirm that the test suite is sensitive enough to detect it. A test that never fails — even when the code is broken — proves nothing.
+The test for mark 90 failed straight away. After I changed `>` back to `>=`, all 15 tests passed again. This experiment is called mutation testing. It means you break the code on purpose to see if your tests notice. If no test fails, the tests are not good enough.
 
 ---
 
 # 9. Testing Results
 
-All tests were executed using:
+I ran all tests using:
 
 ```
 mvn test
@@ -170,10 +168,10 @@ GradingService tests finished
 
 ![All 15 tests passing](Testing_images/build_mvn_test_when_marks_was_equla_to_90.png)
 
-All 15 tests passed. A failing test was intentionally produced during the mutation experiment (see Section 8) to confirm that the test suite can detect real bugs.
+All 15 tests passed.
 
 ---
 
 # 10. Conclusion
 
-The Exam Grading System correctly implements all five grade rules and both invalid-input rules. The test suite covers all seven equivalence partitions, all twelve boundary values, batch grading, and class average calculation. All five JUnit lifecycle annotations were used with the correct scope and purpose. The mutation experiment confirmed that the boundary tests are sensitive enough to catch the most common grading bug — an off-by-one error in a boundary condition.
+I built the Exam Grading System and tested all the grading rules. I wrote tests for every boundary value and every group of marks. I used all five JUnit annotations and the right assertions for each situation. I also broke the code on purpose to prove that my tests can catch real bugs. Everything passed in the end.
