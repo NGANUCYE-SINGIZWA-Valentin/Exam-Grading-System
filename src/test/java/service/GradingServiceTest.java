@@ -1,3 +1,6 @@
+package service;
+
+import domain.ExamMark;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -107,8 +110,8 @@ public class GradingServiceTest {
 
     @Test
     public void gradeAll_shouldReturnGradesInTheSameOrder() {
-        // assertArrayEquals compares element by element.
-        // assertEquals would compare array references and fail even with identical contents.
+        // assertArrayEquals checks each value one by one.
+        // assertEquals would just compare if they are the same object, which they are not.
         assertArrayEquals(new String[]{"A", "F", "C"}, service.gradeAll(new int[]{95, 40, 71}));
     }
 
@@ -116,12 +119,20 @@ public class GradingServiceTest {
 
     @Test
     public void classAverage_shouldReturnCorrectAverage() {
-        // delta 0.001 tolerates harmless floating-point rounding differences
+        // delta 0.001 allows for very small differences in double results
         assertEquals(75.0, service.classAverage(new int[]{60, 70, 80, 90}), 0.001);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void classAverage_shouldThrowException_whenMarksAreEmpty() {
         service.classAverage(new int[]{});
+    }
+
+    // --- domain class test ---
+
+    @Test
+    public void gradeExamMark_shouldReturnCorrectGrade() {
+        ExamMark examMark = new ExamMark("Valentin", 95);
+        assertEquals("A", service.gradeExamMark(examMark));
     }
 }

@@ -13,6 +13,8 @@
 
 This report is about the testing I did for the Exam Grading System project. I used JUnit 4 and Maven. The goal was to write a service that gives letter grades based on marks, and then write tests to check that it works correctly.
 
+The project follows the same structure we used in class: a `domain` package for the entity class (`ExamMark`), a `service` package for the business logic (`GradingService`), and a test class under `src/test/java`.
+
 The system takes a mark between 0 and 100 and returns a grade like A, B, C, D, or F. If the mark is less than 0 or more than 100, the system throws an error. It can also grade many marks at once using `gradeAll`, and calculate the class average using `classAverage`.
 
 ---
@@ -29,7 +31,7 @@ I used this to create a new `GradingService` before each test. This way every te
 
 ## @Test
 
-This marks a method as a test. I used it on all 15 tests. When I add `expected = IllegalArgumentException.class` inside it, JUnit checks that the method throws that error.
+This marks a method as a test. I used it on all 16 tests. When I add `expected = IllegalArgumentException.class` inside it, JUnit checks that the method throws that error.
 
 ## @After
 
@@ -95,6 +97,7 @@ I wrote a separate test for each of these values because mistakes usually happen
 | `gradeAll_shouldReturnGradesInTheSameOrder` | Check gradeAll returns grades in order | `{"A", "F", "C"}` |
 | `classAverage_shouldReturnCorrectAverage` | Check average of 4 marks | `75.0` |
 | `classAverage_shouldThrowException_whenMarksAreEmpty` | Check empty array gives error | Error |
+| `gradeExamMark_shouldReturnCorrectGrade` | Check domain class ExamMark works with the service | `"A"` |
 
 ---
 
@@ -138,7 +141,7 @@ To check that my tests can actually catch bugs, I changed `mark >= 90` to `mark 
 **Result:**
 
 ```
-Tests run: 15, Failures: 1, Errors: 0, Skipped: 0
+Tests run: 16, Failures: 1, Errors: 0, Skipped: 0
 
 FAILED: grade_shouldReturnA_whenMarkIsNinety
 expected:<A> but was:<B>
@@ -146,7 +149,7 @@ expected:<A> but was:<B>
 
 ![Failing test after introducing bug](Testing_images/failing_mvn_test_when_marks_was_greater_than_to_90.png)
 
-The test for mark 90 failed straight away. After I changed `>` back to `>=`, all 15 tests passed again. This experiment is called mutation testing. It means you break the code on purpose to see if your tests notice. If no test fails, the tests are not good enough.
+The test for mark 90 failed straight away. After I changed `>` back to `>=`, all 16 tests passed again. This experiment is called mutation testing. It means you break the code on purpose to see if your tests notice. If no test fails, the tests are not good enough.
 
 ---
 
@@ -159,19 +162,19 @@ mvn test
 ```
 
 ```
-[INFO] Running GradingServiceTest
+[INFO] Running service.GradingServiceTest
 Starting GradingService tests
 GradingService tests finished
-[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.132 s
+[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.097 s
 [INFO] BUILD SUCCESS
 ```
 
-![All 15 tests passing](Testing_images/build_mvn_test_when_marks_was_equla_to_90.png)
+![All 16 tests passing](Testing_images/build_mvn_test_when_marks_was_equla_to_90.png)
 
-All 15 tests passed.
+All 16 tests passed.
 
 ---
 
 # 10. Conclusion
 
-I built the Exam Grading System and tested all the grading rules. I wrote tests for every boundary value and every group of marks. I used all five JUnit annotations and the right assertions for each situation. I also broke the code on purpose to prove that my tests can catch real bugs. Everything passed in the end.
+I built the Exam Grading System and tested all the grading rules. I followed the same structure from class with a `domain` package for `ExamMark` and a `service` package for `GradingService`. I wrote tests for every boundary value and every group of marks. I used all five JUnit annotations and the right assertions for each situation. I also broke the code on purpose to prove that my tests can catch real bugs. Everything passed in the end.

@@ -1,3 +1,7 @@
+package service;
+
+import domain.ExamMark;
+
 public class GradingService {
 
     public String grade(int mark) {
@@ -9,6 +13,10 @@ public class GradingService {
         if (mark >= 70) return "C";
         if (mark >= 60) return "D";
         return "F";
+    }
+
+    public String gradeExamMark(ExamMark examMark) {
+        return grade(examMark.getMark());
     }
 
     public String[] gradeAll(int[] marks) {
